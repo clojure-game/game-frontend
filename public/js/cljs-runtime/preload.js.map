@@ -1,1 +1,0 @@
-{"version":3,"sources":["preload.cljs"],"mappings":";AAGA,AAACA;AAED,kBAAA,lBAAuBC;AAAvB,AACE,OAACC","names":["uix.dev/init-fast-refresh!","preload/refresh","uix.dev/refresh!"],"sourcesContent":["(ns preload\n  (:require [uix.dev]))\n\n(uix.dev/init-fast-refresh!)\n\n(defn ^:dev/after-load refresh []\n  (uix.dev/refresh!))\n"]}
