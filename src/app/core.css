@@ -1,6 +1,7 @@
 :root {
-    --color-accent: #266cf5;
+    --color-accent: grey;
     --color-text: #173878;
+    color: whitesmoke
 }
 
 html {
@@ -21,6 +22,7 @@ body {
     line-height: 1.4;
     text-rendering: optimizeLegibility;
     display: flex;
+    background-color: rgb(21, 21, 21);
     align-items: center;
     justify-content: center;
     width: 100vw;
@@ -40,9 +42,9 @@ a {
     display: flex;
     flex-direction: column;
     width: 100%;
-    background: #fafafa;
+    background: rgb(63, 63, 63);
     border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0px 0px 30px rgb(52, 52, 52);
     border: 6px solid var(--color-accent);
 }
 
@@ -57,51 +59,12 @@ a {
     padding: 8px 0;
 }
 
-.text-input {
-    font-size: 18px;
-    padding: 8px 12px;
-    border-left: none;
-    border-right: none;
-    border-top: 2px solid var(--color-accent);
-    border-bottom: 2px solid var(--color-accent);
-    color: var(--color-text);
+.go-button {
+    justify-content: center;
+    background-color: grey;
+    padding: 8px 0;
 }
 
-.todo-item {
-    border-bottom: 2px solid var(--color-accent);
-    font-size: 18px;
-    padding: 8px 12px;
-    background: rgba(0, 0, 255, 0.1);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-weight: 500;
-}
-
-.todo-item-control {
-    width: 20px;
-    height: 20px;
-    margin: 0 12px 0 0;
-}
-
-.todo-item-text {
-    flex: 1;
-    color: var(--color-text);
-}
-
-.todo-item-delete-button {
-    border: none;
-    background: transparent;
-    font-size: 20px;
-    color: #ff3c3c;
-    cursor: pointer;
-}
-
-.todo-item-text-field {
-    font-size: 18px;
-    border: none;
-    background: transparent;
-    color: var(--color-text);
-    outline: none;
-    flex: 1;
+.go-button:hover {
+    background-color: rgb(138, 138, 138);
 }

@@ -107,11 +107,11 @@
 
 (defui text-field [{:keys [on-add-todo]}]
   (let [[value set-value!] (uix/use-state "http://localhost:8001")]
-    ($ :input.text-input
-       {:value value
-        :placeholder "Enter game server address"
-        :on-change (fn [^js e]
-                     (set-value! (.. e -target -value)))})))
+    ($ :button.go-button
+       {:value value 
+        :on-click (fn [^js e]
+                     (set-value! (.. e -target -value)))}
+       "Connect to server and start game")))
 
 
 (defui editable-text [{:keys [text text-style on-done-editing]}]
