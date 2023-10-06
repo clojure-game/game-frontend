@@ -1,1 +1,69 @@
-:root{--color-accent:grey;--color-text:#173878;color:#f5f5f5}html{box-sizing:border-box}html *{box-sizing:inherit}body{letter-spacing:0;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;-moz-font-feature-settings:"liga" on;text-rendering:optimizelegibility;width:100vw;height:100vh;background-color:#151515;justify-content:center;align-items:center;margin:0;font:400 14px/1.4 Inter,sans-serif;display:flex}input{font-family:Inter,sans-serif}a{color:var(--color-accent);font-weight:500}.app{width:100%;border:6px solid var(--color-accent);background:#3f3f3f;border-radius:10px;flex-direction:column;display:flex;box-shadow:0 0 30px #343434}.app-header{justify-content:center;padding:8px 0;display:flex}.app-footer{text-align:center;padding:8px 0}.go-button{background-color:gray;justify-content:center;padding:8px 0}.go-button:hover{background-color:#8a8a8a}
+:root {
+  --color-accent: grey;
+  --color-text: #173878;
+  color: #f5f5f5;
+}
+
+html {
+  box-sizing: border-box;
+}
+
+html * {
+  box-sizing: inherit;
+}
+
+body {
+  letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -moz-font-feature-settings: "liga" on;
+  text-rendering: optimizelegibility;
+  width: 100vw;
+  height: 100vh;
+  background-color: #151515;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  font: 400 14px / 1.4 Inter, sans-serif;
+  display: flex;
+}
+
+input {
+  font-family: Inter, sans-serif;
+}
+
+a {
+  color: var(--color-accent);
+  font-weight: 500;
+}
+
+.app {
+  width: 100%;
+  border: 6px solid var(--color-accent);
+  background: #3f3f3f;
+  border-radius: 10px;
+  flex-direction: column;
+  display: flex;
+  box-shadow: 0 0 30px #343434;
+}
+
+.app-header {
+  justify-content: center;
+  padding: 8px 0;
+  display: flex;
+}
+
+.app-footer {
+  text-align: center;
+  padding: 8px 0;
+}
+
+.go-button {
+  background-color: gray;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.go-button:hover {
+  background-color: #8a8a8a;
+}

@@ -8,8 +8,6 @@
    [cljs-http.client :as http]
    [cljs.core.async :refer [<!]]))
 
-(def game (atom nil))
-
 (def server-address "http://localhost:8001")
 
 (defui header []
@@ -25,17 +23,18 @@
 (defui game-component [{:keys [size]}]
   (let [[game-state set-game-state!] (uix.core/use-state {})
         filter-game-enteties (fn [filter-fn] (filter filter-fn game-state))
-        game-blocks (filter-game-enteties (fn [game-entity]
-                                            (= :block
-                                               (:type game-entity))))
+        get-entities-by-type (fn [type] (filter-game-enteties
+                                         (fn [game-entity]
+                                           (= type
+                                              (:type game-entity)))))
+        game-blocks (get-entities-by-type :block)
         game-players (filter-game-enteties (fn [game-entity]
                                              (or (= :p1
                                                     (:type game-entity))
                                                  (= :p2
                                                     (:type game-entity)))))
-        game-bombs (filter-game-enteties (fn [game-entity]
-                                           (= :bomb
-                                              (:type game-entity))))]
+        game-bombs (get-entities-by-type :bomb)
+        game-powerups (get-entities-by-type :powerup)]
     (js/window.addEventListener
      "keydown"
      (fn [^js e]
@@ -67,100 +66,54 @@
                (send-action "/create-game" {})))))
     ($ :div.game
        (->> (range size)
-            (map (fn [y]
-                   ($ :div {:key   y
-                            :id    y
-                            :style {:display "flex"}}
-                      (->> (range size)
-                           (map (fn [x]
-                                  (let [is-blocked? (not-empty
-                                                     (filter (fn [block] (= (:pos block)
-                                                                            {:x x :y y}))
-                                                             game-blocks))
-                                        is-bomb? (not-empty
-                                                  (filter (fn [bomb] (= (:pos bomb)
-                                                                        {:x x :y y}))
-                                                          game-bombs))
-                                        is-player? (fn [player-id] (not-empty (filter (fn [player] (= {:pos {:x x :y y}
-                                                                                                       :type player-id}
-                                                                                                      player)) game-players)))
-                                        is-player-1? (is-player? :p1)
-                                        is-player-2? (is-player? :p2)]
-                                    ($ :div
-                                       {:key   x
-                                        :id    x
-                                        :style {:width            "20px"
-                                                :height           "20px"
-                                                :background-color (cond is-blocked? "black"
-                                                                        is-player-1? "blue"
-                                                                        is-player-2? "red"
-                                                                        :else "white")
-                                                :border           (if is-blocked?
-                                                                    "1px solid white"
-                                                                    "1px solid black")
-                                                :box-sizing       "border-box"}}
-                                       (cond
-                                         is-bomb? "💣"
-                                         is-player-1? ""
-                                         is-player-2? ""
-                                         :else "")))))))))))))
+            (map
+             (fn [y]
+               ($ :div {:key   y
+                        :id    y
+                        :style {:display "flex"}}
+                  (->> (range size)
+                       (map
+                        (fn [x]
+                          (let [has-position? (fn [entities]
+                                                (not-empty
+                                                 (filter (fn [entity]
+                                                           (= (:pos entity)
+                                                              {:x x :y y}))
+                                                         entities)))
+                                is-blocked? (has-position? game-blocks)
+                                is-bomb? (has-position? game-bombs)
+                                is-powerup? (has-position? game-powerups)
+                                is-player? (fn [player-id]
+                                             (not-empty
+                                              (filter (fn [player]
+                                                        (= {:pos {:x x :y y}
+                                                            :type player-id}
+                                                           player)) game-players)))
+                                is-player-1? (is-player? :p1)
+                                is-player-2? (is-player? :p2)]
+                            ($ :div
+                               {:key   x
+                                :id    x
+                                :style {:width            "20px"
+                                        :height           "20px"
+                                        :background-color (cond is-blocked? "lightgrey"
+                                                                is-player-1? "blue"
+                                                                is-player-2? "red"
+                                                                :else "grey")
+                                        :border           (if is-blocked?
+                                                            "2px groove grey"
+                                                            "0.5px solid #404040")
+                                        :box-sizing       "border-box"}}
+                               (cond
+                                 is-bomb? "💣"
+                                 is-powerup? "⭐️"
+                                 is-player-1? ""
+                                 is-player-2? ""
+                                 :else "")))))))))))))
 
-(defui text-field [{:keys [on-add-todo]}]
-  (let [[value set-value!] (uix/use-state "http://localhost:8001")]
-    ($ :button.go-button
-       {:value value 
-        :on-click (fn [^js e]
-                     (set-value! (.. e -target -value)))}
-       "Connect to server and start game")))
-
-
-(defui editable-text [{:keys [text text-style on-done-editing]}]
-  (let [[editing? set-editing!] (uix/use-state false)
-        [editing-value set-editing-value!] (uix/use-state "")]
-    (if editing?
-      ($ :input.todo-item-text-field
-         {:value editing-value
-          :auto-focus true
-          :on-change (fn [^js e]
-                       (set-editing-value! (.. e -target -value)))
-          :on-key-down (fn [^js e]
-                         (when (= "Enter" (.-key e))
-                           (set-editing-value! "")
-                           (set-editing! false)
-                           (on-done-editing editing-value)))})
-      ($ :span.todo-item-text
-         {:style text-style
-          :on-click (fn [_]
-                      (set-editing! true)
-                      (set-editing-value! text))}
-         text))))
-
-(s/def :todo/text string?)
-(s/def :todo/status #{:unresolved :resolved})
-
-(s/def :todo/item
-  (s/keys :req-un [:todo/text :todo/status]))
-
-(defui todo-item
-  [{:keys [created-at text status on-update-todos] :as props}]
-  {:pre [(s/valid? :todo/item props)]}
-  ($ :.todo-item
-     {:key created-at}
-     ($ :input.todo-item-control
-        {:type :checkbox
-         :checked (= status :resolved)
-         :on-change (fn [_]
-                      (on-update-todos #(update-in % [created-at :status] {:unresolved :resolved
-                                                                           :resolved :unresolved})))})
-     ($ editable-text
-        {:text text
-         :text-style {:text-decoration (when (= :resolved status) :line-through)}
-         :on-done-editing (fn [value]
-                            (on-update-todos #(assoc-in % [created-at :text] value)))})
-     ($ :button.todo-item-delete-button
-        {:on-click (fn [_]
-                     (on-update-todos #(dissoc % created-at)))}
-        "×")))
+(defui button []
+  ($ :button.go-button
+     "Press this button to do nothing, press enter to start/reset the game"))
 
 (defn use-persistent-state
   "Loads initial state from local storage and persists every updated state value
@@ -183,12 +136,7 @@
   (let [[todos set-todos!] (use-persistent-state "uix-starter/todos" (sorted-map-by >))]
     ($ :.app
        ($ header)
-       ($ text-field {:on-add-todo set-todos!})
-       (for [[created-at todo] todos]
-         ($ todo-item
-            (assoc todo :created-at created-at
-                   :key created-at
-                   :on-update-todos set-todos!)))
+       ($ button)
        ($ game-component {:size 20})
        ($ footer))))
 
